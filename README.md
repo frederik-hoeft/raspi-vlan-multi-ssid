@@ -12,9 +12,9 @@ The purpose of this repository is to provide a reference for setting up a multi-
 The network setup is based on a hypothetical scenario where there are multiple types of devices that need to connect to the network, each with different access requirements.
 
 - **Trusted IoT devices** have access to internal services and the internet and can be accessed by trusted local subnets. These may be devices that you own or control, such as IoT devices running open-source software with a known security profile, or devices that you trust to have internet access.
-- **Trusted mobile devices** have access to internal services and the internet, but shouldn't be accessed from other hosts themselves. These may include your personal computer, phone, or other devices that you trust to have internet access but not internal services.
-- **External IoT devices** are restricted from accessing the internet and internal services, but can be accessed by trusted local subnets. These may include proprietary "smart home" devices, printerns, or devices that you don't trust to have internet access.
-- **Guest devices** have internet access but no access to internal services.
+- **Trusted mobile devices** have access to internal services and the internet, but shouldn't be accessed from other hosts themselves. These may include your personal computer, phone, or other devices that you trust to have access to the internet and the internal network.
+- **External IoT devices** are restricted from accessing the internet and internal services, but can be accessed by trusted local subnets. These may include proprietary "smart home" devices, printers, or devices that you don't trust to have internet access. You probably don't want to allow your WiFi-lightbulbs to call home to _*<insert name of country or company you don't trust>_*.
+- **Guest devices** have internet access but no access to internal services. These may include devices from your friends, customers, or other people who visit your home or office and need temporary access to the internet.
 
 The network interfaces are configured using the [`interfaces.conf`](/etc/network/interfaces.conf) file in the `etc/network/` directory. This file uses the [`interfaces-conf.py`](/etc/network/interfaces-conf.py) pre-processor script for basic variable substitution and easier configuration management.
 
