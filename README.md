@@ -1,6 +1,6 @@
 # Raspberry Pi Multi-SSID Wireless Access Point Configuration + VLAN support
 
-This repository contains a proof of concept for setting up your Raspberry Pi as a multi-SSID wireless access point in VLAN "access mode". 
+This repository contains a proof of concept for setting up your Raspberry Pi as a multi-SSID wireless access point in Cisco-style VLAN "access mode". 
 So traffic from different SSIDs can be separated using VLANs, allowing clients to remain unaware of the whole VLAN shenanigans.
 
 ## Purpose
