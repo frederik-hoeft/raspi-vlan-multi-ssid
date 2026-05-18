@@ -1,0 +1,70 @@
+#!/bin/sh
+
+set -eu
+
+# Physical radio as named by /etc/systemd/network/10-radio.link
+BASE_IFACE="radio0"
+
+# MAC addresses for hostapd interfaces should be unique and in the same OUI block as the base radio to avoid confusing some drivers.
+# Keep these in an aligned contiguous BSSID block.
+RADIO0_MAC="6a:5b:4c:3d:2e:10"
+RADIO1_MAC="6a:5b:4c:3d:2e:11"
+RADIO2_MAC="6a:5b:4c:3d:2e:12"
+RADIO3_MAC="6a:5b:4c:3d:2e:13"
+
+get_phy() {
+    iw dev "$BASE_IFACE" info | awk '/wiphy/ { print "phy" $2; exit }'
+}
+
+iface_type() {
+    iw dev "$1" info 2>/dev/null | awk '/type/ { print $2; exit }'
+}
+
+ensure_ap_iface() {
+    name="$1"
+    mac="$2"
+    phy="$3"
+
+    if iw dev "$name" info >/dev/null 2>&1; then
+        type="$(iface_type "$name")"
+
+        if [ "$type" = "AP" ] || [ "$type" = "__ap" ]; then
+            ip link set dev "$name" address "$mac" 2>/dev/null || true
+            return 0
+        fi
+
+        ip link set dev "$name" down 2>/dev/null || true
+
+        if iw dev "$name" del 2>/dev/null; then
+            :
+        else
+            # Some drivers refuse deleting the original netdev. Fall back to
+            # changing its type in-place. This path is mainly for radio0.
+            iw dev "$name" set type __ap
+            ip link set dev "$name" address "$mac" 2>/dev/null || true
+            return 0
+        fi
+    fi
+
+    iw phy "$phy" interface add "$name" type __ap addr "$mac"
+}
+
+if ! iw dev "$BASE_IFACE" info >/dev/null 2>&1; then
+    echo "Base interface $BASE_IFACE does not exist or is not a wireless interface" >&2
+    exit 1
+fi
+
+PHY="$(get_phy)"
+
+# Ensure all bridge-facing Wi-Fi interfaces are AP-type before ifupdown2 tries
+# to enslave them into br_trunk.
+ensure_ap_iface radio0 "$RADIO0_MAC" "$PHY"
+ensure_ap_iface radio1 "$RADIO1_MAC" "$PHY"
+ensure_ap_iface radio2 "$RADIO2_MAC" "$PHY"
+ensure_ap_iface radio3 "$RADIO3_MAC" "$PHY"
+
+# Leave actual bridge/VLAN membership to ifupdown2.
+ip link set dev radio0 up 2>/dev/null || true
+ip link set dev radio1 up 2>/dev/null || true
+ip link set dev radio2 up 2>/dev/null || true
+ip link set dev radio3 up 2>/dev/null || true

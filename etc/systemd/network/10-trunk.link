@@ -1,0 +1,9 @@
+# Ensures a stable interface name for the ethernet trunk interface
+
+[Match]
+PermanentMACAddress=a1:b2:c3:d4:e5:f6
+Type=ether
+
+[Link]
+NamePolicy=
+Name=trunk0

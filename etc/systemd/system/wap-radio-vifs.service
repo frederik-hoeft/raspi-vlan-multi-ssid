@@ -1,0 +1,15 @@
+[Unit]
+Description=Create WAP virtual Wi-Fi AP interfaces
+Documentation=man:iw(8)
+DefaultDependencies=no
+After=systemd-udev-settle.service
+Wants=systemd-udev-settle.service
+Before=networking.service
+ConditionPathExists=/sys/class/net/radio0
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/wap-radio-vifs
+
+[Install]
+WantedBy=networking.service

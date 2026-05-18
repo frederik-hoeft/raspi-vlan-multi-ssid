@@ -1,0 +1,26 @@
+[Unit]
+Description=Access point and authentication server for Wi-Fi and Ethernet
+Documentation=man:hostapd(8)
+Requires=networking.service
+After=networking.service
+ConditionPathExists=/sys/class/net/radio0
+ConditionPathExists=/sys/class/net/radio1
+ConditionPathExists=/sys/class/net/radio2
+ConditionPathExists=/sys/class/net/radio3
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=2
+
+RuntimeDirectory=hostapd
+RuntimeDirectoryMode=0750
+
+ExecStart=/usr/sbin/hostapd \
+  /etc/hostapd/radio0.conf \
+  /etc/hostapd/radio1.conf \
+  /etc/hostapd/radio2.conf \
+  /etc/hostapd/radio3.conf
+
+[Install]
+WantedBy=multi-user.target

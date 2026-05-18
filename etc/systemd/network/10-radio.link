@@ -1,0 +1,12 @@
+# Ensures a stable interface name and aligned MAC address for radio0
+
+[Match]
+PermanentMACAddress=6a:5b:4c:3d:2e:1f
+Type=wlan
+
+[Link]
+NamePolicy=
+Name=radio0
+MACAddressPolicy=none
+# MAC addresses for hostapd interfaces should not cross block boundaries
+MACAddress=6a:5b:4c:3d:2e:10
