@@ -173,6 +173,38 @@ wap-radio-vifs.service  →  networking.service  →  hostapd.service
 - **5 GHz / dual-band**: Change `hw_mode`, `channel`, and `ht_capab`/`vht_capab` in the hostapd configs. If using a second physical radio, add another `.link` file and extend `wap-radio-vifs`.
 - **Static IP / no DHCP**: Replace the `inet dhcp` line on `br_trunk` with `inet static` and add address/gateway/dns directives.
 
+## Monitoring (Optional)
+
+The [monitoring/](monitoring/) directory contains an optional observability stack using **Prometheus Node Exporter** and **Grafana** to track system resources and per-interface network throughput on the WAP.
+
+### Components
+
+| Component | Purpose |
+|-----------|---------|
+| [docker-compose.yml](monitoring/docker-compose.yml) | Deploys `node-exporter` in host-network mode, exposing hardware/OS metrics on port 9100 |
+| [dashboard JSON](monitoring/dashboard-1779301341873.json) | Pre-built Grafana dashboard for CPU, memory, storage, I/O, and per-radio network usage |
+
+### Setup
+
+1. Install Docker on the Raspberry Pi.
+2. Create a `.env` file in the `monitoring/` directory with your management IP:
+   ```sh
+   HOST_IP=<management-ip>
+   ```
+3. Start the exporter:
+   ```sh
+   cd monitoring
+   docker compose up -d
+   ```
+4. Point a Prometheus instance at `http://<management-ip>:9100/metrics`.
+5. Import the provided dashboard JSON into Grafana.
+
+### Dashboard
+
+The included Grafana dashboard provides at-a-glance visibility into WAP health, including per-SSID network throughput (`br_trunk`, `radio0`–`radio3`, `trunk0`) and standard system resource panels:
+
+![Grafana System Resources Dashboard](monitoring/System%20Resources-1779301295073.png)
+
 ## Security Considerations
 
 - VLAN isolation is enforced at the bridge level. Upstream firewall rules are still required to control inter-VLAN routing.
